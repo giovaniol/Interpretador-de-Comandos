@@ -26,7 +26,7 @@ void receberComando()
 {
     // do
     // {
-    // receberComando();
+    // receberComando()
     // } while (comando != "exit");
     // __pid_t boy;
 
@@ -46,6 +46,6 @@ void executaComando(char comando[])
     parte2 = strtok(NULL, " ");
     printf("Eu sou a parte 1 %s\n", parte1);
     printf("Eu sou a parte 2 %s\n", parte2);
-    
+
     
 }
