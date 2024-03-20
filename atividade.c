@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
 #define MAX 50
 // usar strcmp para comparar strings
 // char comando[80];
@@ -18,7 +19,7 @@ int main(int argc, char const *argv[])
 {
     char comando[MAX];
 
-    char frutas[] = "cd banana";
+    char frutas[] = "ls -la bolacha biscoito";
     executaComando(frutas);
     return 0;
 }
@@ -39,13 +40,31 @@ void receberComando()
 }
 void executaComando(char comando[])
 {
-    char array[MAX];
-    int tamanho = strlen(comando); // isto funciona só para delimitador de 1 caractere
-    char *parte2 = strtok(comando, " ");
-    char *parte1 = parte2;
-    parte2 = strtok(NULL, " ");
-    printf("Eu sou a parte 1 %s\n", parte1);
-    printf("Eu sou a parte 2 %s\n", parte2);
+    
+    char comando_copia[MAX];
+    strcpy(comando_copia, comando);
+    char **partes = NULL; 
+    int contador = 0;
 
+    char *parte = strtok(comando_copia, " ");
+
+    // Aloca Todas as partes no Array Partes
+    while (parte != NULL) {
+        partes = realloc(partes, (contador + 1) * sizeof(char *)); // Aloca memória para um novo ponteiro
+        partes[contador] = strdup(parte); // Aloca memória para uma cópia do parte e armazena no array
+        contador++;
+        parte = strtok(NULL, " ");
+    }
+    execve(partes[0], partes[1],  NULL);
+    // Mostra todas as partes do comando
+    for (int i = 0; i < contador; i++) {
+        printf("Parte %d: %s\n", i + 1, partes[i]);
+    }
+
+    // Libera a memória alocada para cada parte e para o array de ponteiros
+    for (int i = 0; i < contador; i++) {
+        free(partes[i]);
+    }
+    free(partes);
     
 }
