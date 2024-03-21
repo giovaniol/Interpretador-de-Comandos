@@ -19,13 +19,13 @@ void receberComando()
 }
 int executaComando()
 {
-    char comando[] = "lambida do meu saco"; //Trocar para o argumento depois
+    char comando[] = "lambida do meu saco"; // Trocar para o argumento depois
     char *partes = strtok(comando, ","), **comandos = malloc(sizeof(char *) * 30);
     int i = 0;
     if (comandos == NULL)
     {
         printf("Falha na alocação de memória");
-        return 1;
+        return 0;
     }
     while (partes != NULL)
     {
@@ -33,11 +33,36 @@ int executaComando()
         i++;
         partes = strtok(NULL, ",");
     }
-
     comandos[i] = NULL;
+    printf("%s\n", comandos[0]);
+
     int contador = i;
     i = 0;
+    int controle = i;
+    while (controle < contador)
+    {
+        char **copia = malloc(sizeof(char *) * 30);
+        if (copia == NULL)
+        {
+            printf("Falha na alocação de memória");
+
+            return 0;
+        }
+        partes = strtok(comandos[controle], " ");
+        while (partes != NULL)
+        { 
+            copia[i] = partes;
+            i++;
+            partes = strtok(NULL, " ");
+        }
+        copia[i] = NULL;
+        free(copia);
+
+        controle++;
+    }
+    printf("%s\n", comandos[0]);
 }
+
 int verificaComando(char **comandos)
 {
 
@@ -52,12 +77,14 @@ int verificaComando(char **comandos)
 
     return executaComando(comandos);
 }
-void iniciarSistema(){
-   
+void iniciarSistema()
+{
+
     char *nomeUsuario = getenv("USER");
     if (nomeUsuario != NULL)
     {
         printf("Olá, %s. Por favor, digite um comando: ", nomeUsuario);
+        printf("\n");
     }
     else
     {
