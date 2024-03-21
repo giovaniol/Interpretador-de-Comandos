@@ -3,68 +3,64 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
-#define MAX 50
-// usar strcmp para comparar strings
-// char comando[80];
-// printf("\nPressione o comando: ");
-// scanf("%s", comando);
-// fflush(stdin);
 
-char *args[] = {"ls", "-la", NULL};
-
+int verificaComando(char **comandos);
+void iniciarSistema();
 void receberComando();
-void executaComando(char comando[]);
+int executaComando();
 
 int main(int argc, char const *argv[])
 {
-    char comando[MAX];
-
-    char frutas[] = "ls -la bolacha biscoito";
-    executaComando(frutas);
-    return 0;
+    iniciarSistema();
+    executaComando();
 }
 void receberComando()
 {
-    // do
-    // {
-    // receberComando()
-    // } while (comando != "exit");
-    // __pid_t boy;
-
-    // printf("\nPressione o comando: ");
-    // scanf("%s", comando);
-    // boy = fork();
-    // execve(comando, args);
-
-    // fflush(stdin);
 }
-void executaComando(char comando[])
+int executaComando()
 {
-    
-    char comando_copia[MAX];
-    strcpy(comando_copia, comando);
-    char **partes = NULL; 
-    int contador = 0;
-
-    char *parte = strtok(comando_copia, " ");
-
-    // Aloca Todas as partes no Array Partes
-    while (parte != NULL) {
-        partes = realloc(partes, (contador + 1) * sizeof(char *)); // Aloca memória para um novo ponteiro
-        partes[contador] = strdup(parte); // Aloca memória para uma cópia do parte e armazena no array
-        contador++;
-        parte = strtok(NULL, " ");
+    char comando[] = "lambida do meu saco"; //Trocar para o argumento depois
+    char *partes = strtok(comando, ","), **comandos = malloc(sizeof(char *) * 30);
+    int i = 0;
+    if (comandos == NULL)
+    {
+        printf("Falha na alocação de memória");
+        return 1;
     }
-    execve(partes[0], partes[1],  NULL);
-    // Mostra todas as partes do comando
-    for (int i = 0; i < contador; i++) {
-        printf("Parte %d: %s\n", i + 1, partes[i]);
+    while (partes != NULL)
+    {
+        comandos[i] = partes;
+        i++;
+        partes = strtok(NULL, ",");
     }
 
-    // Libera a memória alocada para cada parte e para o array de ponteiros
-    for (int i = 0; i < contador; i++) {
-        free(partes[i]);
+    comandos[i] = NULL;
+    int contador = i;
+    i = 0;
+}
+int verificaComando(char **comandos)
+{
+
+    if (comandos[0] == NULL)
+    {
+        return 1;
     }
-    free(partes);
-    
+    if (strcmp(comandos[0], "exit") == 0)
+    {
+        return 1;
+    }
+
+    return executaComando(comandos);
+}
+void iniciarSistema(){
+   
+    char *nomeUsuario = getenv("USER");
+    if (nomeUsuario != NULL)
+    {
+        printf("Olá, %s. Por favor, digite um comando: ", nomeUsuario);
+    }
+    else
+    {
+        printf("Falha na alocação.");
+    }
 }
