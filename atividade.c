@@ -11,8 +11,10 @@ int executaComando();
 
 int main(int argc, char const *argv[])
 {
-    
+    iniciarSistema();
     executaComando();
+    
+    return 0;
 }
 int receberComando()
 {
