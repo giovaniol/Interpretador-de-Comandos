@@ -1,110 +1,87 @@
+
+
 #include <stdio.h>
-#include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
+#include <string.h>
 #include <stdlib.h>
-#define MIN 20
-#define MAX 30
-int verificaComando(char **comandos);
-void iniciarSistema();
-int receberComando();
-int executaComando();
+#include <sys/types.h>
+#include <sys/wait.h>
 
-int main(int argc, char const *argv[])
+#define MAX 100000
+#define TAM 131072
+
+int main()
 {
-    iniciarSistema();
-    executaComando();
-    
-    return 0;
-}
-int receberComando()
-{
-    char comando[]= "a lambida do meu saco";
-    char *partes = strtok(comando, ","), **comandos = malloc(sizeof(char *) * 30);
-    int i = 0, parar, controle = 0;
-    if (comandos == NULL)
-    {
-        printf("Falha na alocação de memória");
-        return 0;
-    }
-    while (partes != NULL)
-    {
-        comandos[i] = partes;
-        i++;
-        partes = strtok(NULL, ",");
-    }
-    comandos[i] = NULL;
-    printf("%s\n", comandos[0]);
+	pid_t pid;
+	char comando[MAX], *argumentos[TAM], *ponteiro, *nomeUsuario = getenv("USER");
+	int i;
 
-    int contador = i;
-    i = 0;
-    
-    while (controle < contador)
-    {
-        char **copia = malloc(sizeof(char *) * 30);
-        if (copia == NULL){
-            printf("Falha na alocação de memória");
+	while (comando[0] != 1)
+	{
+		i = 0;
 
-            return 0;
-        }
-        partes = strtok(comandos[controle], " ");
-        while (partes != NULL){ 
-            copia[i] = partes;
-            i++;
-            partes = strtok(NULL, " ");
-        }
-        copia[i] = NULL;
-        parar = verificaComando(copia);
-        free(copia);
+		printf("Olá, %s. Por favor, digite um comando: ", nomeUsuario);
+		gets(comando);
 
-        controle++;
-    }
-}
-int executaComando()
-{
-    // Aparentemente, este código já executa como terminal, mesmo parecendo que o processo acaba.
-    pid_t pid;
-    int status, contador = 0;
-    char *texto[MIN];
-    
-    pid = fork();
-    if (pid != 0) {
-        waitpid(pid, &status, 0);
-        
+		ponteiro = strtok(comando, " ");
 
-    } else {
-        char *comando, *param[MAX];
-        comando = strtok(texto, ",");
-        param[0] = comando;
-        
-        do {
-            param[++contador] = strtok(NULL, ",");
-        } while (param[contador] != NULL);
+		while (ponteiro)
+		{
+			argumentos[i] = ponteiro;
+			ponteiro = strtok(NULL, " ");
+			i++;
+		}
 
-        execvp(comando, param);
-        
-        
-        exit(EXIT_FAILURE);
-    }
-    
-}
+		argumentos[i] = NULL;
 
-int verificaComando(char **comandos)
-{
-    
+		if (strcmp(argumentos[0], "cd") == 0)
+		{
+			if (strcmp(argumentos[1], "~") == 0)
+			{
+				char aux[100];
+				strcpy(aux, "~");
+				chdir(getenv("HOME"));
+				printf("%s \n", getcwd(aux, 100));
+			}
+			else
+			{
+				char aux[100];
+				strcpy(aux, argumentos[1]);
+				chdir(aux);
+				printf("\n%s", getcwd(aux, 100));
+			}
+		}
+		else if (strcmp(argumentos[0], "exit") == 0)
+		{
+			return 0;
+		}
+		else
+		{
+			pid = fork();
+			if (pid == 0)
+			{
+				if (execvp(argumentos[0], argumentos) < 0)
+				{
+					printf("Erro\n");
+				}
+			}
+			else
+			{
+				int flagFilho;
+				waitpid(pid, &flagFilho, 0);
+				if (flagFilho == -1)
+				{
+					printf("\nErro\n");
+				}
+			}
+		}
 
-   
-}
-void iniciarSistema()
-{
+		
+	}
 
-    char *nomeUsuario = getenv("USER");
-    if (nomeUsuario != NULL)
-    {
-        printf("Olá, %s. Por favor, digite um comando: ", nomeUsuario);
-        printf("\n");
-    }
-    else
-    {
-        printf("Falha na alocação.");
-    }
+	
+
+	
+	return 0;
 }
